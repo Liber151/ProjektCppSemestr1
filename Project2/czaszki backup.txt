@@ -1,0 +1,133 @@
+#include <SFML/Window.hpp>
+#include <SFML/Graphics.hpp>
+#include <iostream>
+#include <math.h>
+#include <C:\Projects\Project1\Keyboard.hpp>
+using namespace std;
+int main()
+{
+	int width = 1100;
+	int height = 900;
+	int iloscobiektowx = 11;
+	int iloscobiektowy = 9;
+	int globalx = 0;
+	int globaly = 0;
+	int z=0;
+	int y=0;
+	int tempx=803;
+	int tempy=0;
+	int playerflag = 1;
+	float predkosc = 2;
+	float roznicax;
+	float roznicay;
+	int strzalx;
+	int strzaly;
+	int predkoscstrzalu = 5;
+	int kierunekstrzalux = 0;
+	int kierunekstrzaluy = 0;
+	double wielkoscblokowx = width / iloscobiektowx;
+	double wielkoscblokowy = height / iloscobiektowy;
+	sf::RenderWindow window(sf::VideoMode(width, height), "Gierka");
+	window.setFramerateLimit(60);
+	sf::Texture player;
+	player.loadFromFile("C:/Projects/cat.png");
+	sf::RectangleShape rectangle;
+	sf::RectangleShape gracz;
+	sf::Texture enemy;
+	enemy.loadFromFile("C:/Projects/enemy.png");
+	gracz.setSize(sf::Vector2f(50, 50));
+	gracz.setOrigin(25, 25);
+	gracz.setPosition(width / 2, height / 2);
+	rectangle.setSize(sf::Vector2f(100, 100));
+	rectangle.setOrigin(50, 50);
+	gracz.setTexture(&player);
+	rectangle.setTexture(&enemy);
+	sf::RectangleShape pocisk;
+	pocisk.setSize(sf::Vector2f(20, 50));
+	int click = 0;
+	while (window.isOpen())
+	{
+		sf::Event event;
+		while (window.pollEvent(event))
+		{
+			if (event.type == sf::Event::Closed) {
+				window.close();
+			}
+		}
+		globalx = 0;
+		globaly = 0;
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+		{
+			globaly = 3;
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) { globalx = 3; }
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) { globalx = -3; }
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+		{
+			globalx = 3;
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) { globaly = 3; }
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) { globaly = -3; }
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+		{
+			globalx = -3;
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) { globaly = -3; }
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+		{
+			globaly = -3;
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
+			window.close();
+		}
+		else if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+			sf::Vector2i position = sf::Mouse::getPosition(window);
+			//strzelanie in progress
+			float najnaj = 0;
+			kierunekstrzalux = width / 2 - position.x;
+			kierunekstrzaluy = height / 2 - position.y;
+			/*if (width / 2 - position.x > height / 2 - position.y) {
+				najnaj = position.x;
+				kierunekstrzalux = (kierunekstrzalux / sqrt(kierunekstrzalux*kierunekstrzalux));
+				kierunekstrzaluy = (kierunekstrzaluy / sqrt(kierunekstrzaluy*kierunekstrzaluy))*position.x/position.y;
+			}
+			else {
+				najnaj = position.y;
+				kierunekstrzalux = (kierunekstrzalux / sqrt(kierunekstrzalux*kierunekstrzalux))*position.y / position.x;
+				kierunekstrzaluy = (kierunekstrzaluy / sqrt(kierunekstrzaluy*kierunekstrzaluy));
+			}*/
+			cout << position.x << "\t" << position.y << endl;
+			pocisk.setPosition(width / 2, height / 2);
+			pocisk.setTexture(&player);
+		}
+		pocisk.setPosition(pocisk.getPosition().x - kierunekstrzalux+globalx,pocisk.getPosition().y-kierunekstrzaluy+globaly);
+		float najwiekszy = 0;
+		window.clear(sf::Color::Blue);
+		if (playerflag == 1) {
+			float kierunekx = width / 2 - tempx;
+			float kieruneky = height / 2 - tempy;
+			if (kierunekx < kieruneky) {
+				najwiekszy = kierunekx;
+			}
+			else {
+				najwiekszy = kieruneky;
+			}
+			float regulator = 0.5;
+			kierunekx = (kierunekx + regulator) / sqrt((kierunekx + regulator)*(kierunekx + regulator));
+			kieruneky = (kieruneky + regulator) / sqrt((kieruneky + regulator)*(kieruneky + regulator));
+			kierunekx *= predkosc;
+			kieruneky *= predkosc;
+			//tempx += kierunekx + globalx;
+			//tempy += kieruneky + globaly;
+			rectangle.setPosition(tempx, tempy);
+			window.draw(pocisk);
+			window.draw(rectangle);
+			window.draw(gracz);
+			if (tempx<(width/2)+10 && tempx>(width/2)-10 && tempy<(height / 2) + 10 && tempy >(height / 2) - 10)  {
+				playerflag = 0;
+			}
+		}
+		window.display();
+	}
+	return 0;
+}

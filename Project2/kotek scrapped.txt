@@ -1,0 +1,118 @@
+#include <SFML/Window.hpp>
+#include <SFML/Graphics.hpp>
+#include <iostream>
+#include <math.h>
+using namespace std;
+
+void tlo(int z,int  y,int iloscobiektowx, int iloscobiektowy, float wielkoscblokowy, float wielkoscblokowx, sf::Texture ziemia, sf::RenderWindow &window) {
+	vector<sf::RectangleShape> sprites(iloscobiektowx);
+	for (z = 0; z < iloscobiektowx; z++) {
+		for (y = 0; y < iloscobiektowy; y++) {
+			sprites[z].setPosition(z*wielkoscblokowx, y*wielkoscblokowy);
+			sprites[z].setTexture(&ziemia);
+			sprites[z].setSize(sf::Vector2f(wielkoscblokowx, wielkoscblokowy));
+			window.draw(sprites[z]);
+		}
+	}
+}
+int main()
+{
+	int width = 1100;
+	int height = 900;
+	int iloscobiektowx = 11;
+	int iloscobiektowy = 9;
+	int globalx = 0;
+	int globaly = 0;
+	int z=0;
+	int y=0;
+	int iloscprzeszkod = 2;
+	double wielkoscblokowx = width / iloscobiektowx;
+	double wielkoscblokowy = height / iloscobiektowy;
+	int graczx = (floor(iloscobiektowx / 2))*wielkoscblokowx;
+	int graczy = (floor(iloscobiektowy / 2))*wielkoscblokowy;
+	cout << wielkoscblokowx << "   " << wielkoscblokowy << endl;
+	sf::Texture texture;
+	sf::RenderWindow window(sf::VideoMode(width, height), "Gierka");
+	sf::Texture ziemia;
+	sf::Texture player;
+	sf::Texture trawsko;
+	vector<int> przeszkodyx(iloscprzeszkod);
+	vector<int> przeszkodyy(iloscprzeszkod);
+	przeszkodyx[0]= 6 * wielkoscblokowx;
+	przeszkodyx[1] = 4 * wielkoscblokowx;
+	przeszkodyy[0] = 3 * wielkoscblokowy;
+	przeszkodyy[1] = 3 * wielkoscblokowy;
+	trawsko.loadFromFile("C:/Projects/trawa.png");
+	ziemia.loadFromFile("C:/Projects/dirt.png");
+	player.loadFromFile("C:/Projects/cat.png");
+	window.setFramerateLimit(60);
+	while (window.isOpen())
+	{
+
+		sf::Event event;
+
+		while (window.pollEvent(event))
+		{
+			if (event.type == sf::Event::Closed) {
+				window.close();
+			}
+
+			// uzytkownik nacisnal klawisz
+			if (event.type == sf::Event::KeyPressed) {
+				if (event.key.code == sf::Keyboard::Escape) {
+					window.close();
+				}
+				else if (event.key.code == sf::Keyboard::Up) {
+					globaly += wielkoscblokowy;
+					for (z = 0; z < iloscprzeszkod; z++) {
+						if (graczy == przeszkodyy[z]+globaly && graczx == przeszkodyx[z]+globalx)
+							globaly -= wielkoscblokowy;
+					}
+				}
+				else if (event.key.code == sf::Keyboard::Down) { globaly -= wielkoscblokowy; 
+				for (z = 0; z < iloscprzeszkod; z++) {
+					if (graczy == przeszkodyy[z] + globaly && graczx == przeszkodyx[z] + globalx)
+						globaly += wielkoscblokowy;
+				}
+				}
+				else if (event.key.code == sf::Keyboard::Left) { globalx += wielkoscblokowx; 
+				for (z = 0; z < iloscprzeszkod; z++) {
+					if (graczy == przeszkodyy[z] + globaly && graczx == przeszkodyx[z] + globalx)
+						globalx -= wielkoscblokowx;
+				}
+				}
+				else if (event.key.code == sf::Keyboard::Right) { globalx -= wielkoscblokowx; 
+				for (z = 0; z < iloscprzeszkod; z++) {
+					if (graczy == przeszkodyy[z] + globaly && graczx == przeszkodyx[z] + globalx)
+						globalx += wielkoscblokowx;
+				}
+				}
+			}
+
+		}
+		window.clear(sf::Color::Black);
+
+
+		tlo(z, y,iloscobiektowx, iloscobiektowy, wielkoscblokowy, wielkoscblokowx, ziemia, window);
+
+		sf::RectangleShape gracz;
+		gracz.setTexture(&player);
+		gracz.setPosition((floor(iloscobiektowx/2))*wielkoscblokowx,(floor(iloscobiektowy/2))*wielkoscblokowy );
+		gracz.setSize(sf::Vector2f(wielkoscblokowx, wielkoscblokowy));
+		window.draw(gracz);
+
+	sf::RectangleShape trawa;
+	sf::RectangleShape trawaz;
+	trawaz.setTexture(&trawsko);
+	trawa.setTexture(&trawsko);
+	trawaz.setPosition(przeszkodyx[1] + globalx, przeszkodyy[1] + globaly);
+	trawa.setPosition(przeszkodyx[0]+globalx,przeszkodyy[0]+globaly);
+	trawa.setSize(sf::Vector2f(wielkoscblokowx, wielkoscblokowy));
+	trawaz.setSize(sf::Vector2f(wielkoscblokowx, wielkoscblokowy));
+	window.draw(trawa);
+	window.draw(trawaz);
+		window.display();
+	}
+
+	return 0;
+}
